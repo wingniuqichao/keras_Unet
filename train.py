@@ -9,7 +9,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 from config import config
-from keras.utils import plot_model
+# from keras.utils import plot_model
 
 K.clear_session()
 
@@ -84,28 +84,28 @@ def main():
     model.compile(loss='categorical_crossentropy',
                   optimizer=Adam(lr=1e-3),
                   metrics=['accuracy'])
-    plot_model(model, to_file='model.png', show_shapes=True)
+    # plot_model(model, to_file='model.png', show_shapes=True)
     model.summary()
     # 生成图片读取迭代器，用多少读多少，不用一次性全部把图片读进内存，这样可以节省内存。
-    # train = segdata_generator.generator(train_file, train_batch_size, nClasses, img_height, img_width)
-    # val = segdata_generator.generator(val_file, val_batch_size, nClasses, img_height, img_width, train=False)
+    train = segdata_generator.generator(train_file, train_batch_size, nClasses, img_height, img_width)
+    val = segdata_generator.generator(val_file, val_batch_size, nClasses, img_height, img_width, train=False)
 
-    # if not os.path.exists('./results/'):
-    #     os.mkdir('./results')
-    # if not os.path.exists('./weights/'):
-    #     os.mkdir('./weights')
-    # # 每一轮保存历史最好模型，以验证集准确率为依据
-    # save_file = './weights/best_weights.h5'
-    # checkpoint = ModelCheckpoint(save_file, monitor='val_acc', save_best_only=True, save_weights_only=True, verbose=1)
-    # history = model.fit_generator(train,
-    #                     steps_per_epoch=train_size // train_batch_size,
-    #                     validation_data=val,
-    #                     validation_steps=val_size // val_batch_size,
-    #                     epochs=epochs,
-    #                     callbacks=[checkpoint, learning_rate_reduction],
-    #                               )
-    # plot_history(history, './results/', 'Unet')
-    # save_history(history, './results/', 'Unet')
+    if not os.path.exists('./results/'):
+        os.mkdir('./results')
+    if not os.path.exists('./weights/'):
+        os.mkdir('./weights')
+    # 每一轮保存历史最好模型，以验证集准确率为依据
+    save_file = './weights/best_weights.h5'
+    checkpoint = ModelCheckpoint(save_file, monitor='val_acc', save_best_only=True, save_weights_only=True, verbose=1)
+    history = model.fit_generator(train,
+                        steps_per_epoch=train_size // train_batch_size,
+                        validation_data=val,
+                        validation_steps=val_size // val_batch_size,
+                        epochs=epochs,
+                        callbacks=[checkpoint, learning_rate_reduction],
+                                  )
+    plot_history(history, './results/', 'Unet')
+    save_history(history, './results/', 'Unet')
 
 
 if __name__ == '__main__':
